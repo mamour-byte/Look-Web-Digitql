@@ -1,26 +1,262 @@
 @import "tailwindcss";
 
+/* =====================================================================
+   LOOK WEB DIGITAL — Design System global
+   Identité : orange (#ff6b00) + blanc, gris & noir pour les textes.
+   ===================================================================== */
+
 :root {
+  /* ── Couleurs de marque ── */
+  --orange: #ff6b00;
+  --orange-dark: #e85d00;
+  --orange-soft: #fff3ea;
+  --orange-border: #ffd9b8;
+
+  /* ── Neutres ── */
+  --white: #ffffff;
+  --ink: #111111;
+  --ink-soft: #454545;
+
+  /* ── Textes (gris / noir) ── */
+  --text-muted: #686868;
+  --text-faint: #8a8a8a;
+
+  /* ── Surfaces & bordures ── */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --surface-soft: #f7f7fa;
+  --border: #e8e8e8;
+  --line: rgba(17, 17, 17, 0.1);
+  --line-subtle: rgba(17, 17, 17, 0.06);
+
+  /* ── Ombres ── */
+  --shadow-btn: 0 8px 22px rgba(255, 107, 0, 0.26);
+  --shadow-btn-hover: 0 14px 32px rgba(255, 107, 0, 0.36);
+  --shadow-card: 0 30px 70px -40px rgba(17, 17, 17, 0.25);
+
+  /* ── Rayons ── */
+  --radius-btn: 999px;
+  --radius-card: 18px;
+
+  /* ── Typographie (Inter via next/font — layout.tsx) ── */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ── Exposition des tokens à Tailwind 4 ───────────────────────────── */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--orange);
+  --color-primary-dark: var(--orange-dark);
+  --color-primary-soft: var(--orange-soft);
+  --color-primary-border: var(--orange-border);
+  --color-accent: var(--orange);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-muted-foreground: var(--text-muted);
+  --color-text-muted: var(--text-muted);
+  --color-text-faint: var(--text-faint);
+  --color-card: var(--card);
+  --color-surface-soft: var(--surface-soft);
+  --color-border: var(--border);
+  --color-line-subtle: var(--line-subtle);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ── Base ─────────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
 }
 
+html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge legacy */
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  color: var(--White);
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--orange);
+  color: var(--white);
+}
+
+:focus-visible {
+  outline: 2px solid var(--orange);
+  outline-offset: 3px;
+}
+
+/* =====================================================================
+   BOUTONS — modèle unique du site (calqué sur le CTA de la navbar)
+   ═════════════════════════════════════════════════════════════════
+   États : remplissage orange, texte blanc, ombre portée, et sur
+   le survol un balayage noir (#111) qui monte depuis le bas.
+   ===================================================================== */
+.btn {
+  position: relative;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 13px 28px;
+  border-radius: var(--radius-btn);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  line-height: 1.2;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.3s ease, background 0.3s ease, color 0.3s ease,
+    border-color 0.3s ease;
+}
+
+.btn span,
+.btn svg {
+  position: relative;
+  z-index: 1;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Variante principale : orange / blanc  (modèle navbar) */
+.btn-primary {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: var(--shadow-btn);
+}
+
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--ink);
+  transform: translateY(101%);
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary:hover {
+  box-shadow: var(--shadow-btn-hover);
+}
+
+.btn-primary:hover::after {
+  transform: translateY(0);
+}
+
+/* Variante contours : transparent / noir, fond orange au survol */
+.btn-outline {
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+  box-shadow: none;
+}
+
+.btn-outline:hover {
+  background: var(--orange);
+  border-color: var(--orange);
+  color: var(--white);
+  box-shadow: var(--shadow-btn-hover);
+}
+
+/* Variante claire : blanc / noir, fond orange au survol (sur fond sombre) */
+.btn-white {
+  background: var(--white);
+  color: var(--ink);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.14);
+}
+
+.btn-white:hover {
+  background: var(--orange);
+  color: var(--white);
+  box-shadow: var(--shadow-btn-hover);
+}
+
+/* Taille compacte (uniquement en complément de .btn) */
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 0.85rem;
+}
+
+/* =====================================================================
+   ÉTIQUETTES « eyebrow » — grammaire des titres du site
+   ===================================================================== */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--orange);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 26px;
+  height: 1px;
+  background: var(--orange);
+}
+
+/* =====================================================================
+   CONTENEUR UTILITAIRE
+   ===================================================================== */
+.container-site {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding-inline: clamp(1.25rem, 5vw, 3rem);
+}
+
+/* ── accessibilité : respect du mouvement réduit ───────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
 }

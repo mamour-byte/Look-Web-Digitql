@@ -1,69 +1,87 @@
-import Image from "next/image";
+"use client";
+import * as React from "react";
+import Navbar from "./components/layout/Navbar";
+import Footer from "./components/layout/Footer";
+import InversionCircleScrollAnimation from "./components/sections/Scroll";
+import Services from "./components/sections/Services";
+import { Gallery, GalleryGrid, GalleryImage } from "./components/sections/Galery";
+import Team from "./components/sections/Team";
+import StatsPartners from "./components/sections/StatsandPartners";
+
+const IMAGES = [
+  { id: "1", src: "./images/audio.jpg" },
+  { id: "2", src: "./images/brand1.jpg" },
+  { id: "13", src: "./images/srt.png" },
+  { id: "3", src: "./images/cinema.jpg" },
+  { id: "4", src: "./images/cover.jpg" },
+  { id: "5", src: "./images/info.jpg" },
+  { id: "6", src: "./images/logi.jpg" },
+  { id: "7", src: "./images/drone.jpg" },
+  { id: "8", src: "./images/sono.jpg" },
+  { id: "9", src: "./images/tablette.jpg" },
+  { id: "10", src: "./images/mark.jpg" },
+  { id: "11", src: "./images/social.jpg" },
+  { id: "12", src: "./images/dev.jpg" },
+  
+];
 
 export default function Home() {
+
+
+// Fix for app.tsx infrastructure horizontal scrolling
+  React.useEffect(() => {
+    document.documentElement.style.overflowX = "hidden";
+    document.body.style.overflowX = "hidden";
+    return () => {
+      document.documentElement.style.overflowX = "";
+      document.body.style.overflowX = "";
+    };
+  }, []);
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+  <>
+    <Navbar/>
+    {/* <Hero/> */}
+    <InversionCircleScrollAnimation
+      videoSrc="/videos/stade.mp4"
+      poster="/images/hero-poster.jpg"
+    />
+
+    <div className="w-full self-start bg-white">
+      <div id="realisation" className="max-w-7xl mx-auto px-6 py-12 md:py-16">
+        <header className="mb-10 space-y-4">
+          <h1 className="text-5xl font-bold tracking-tight text-primary">
+            Des projets qui font rayonner votre marque.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-xl text-muted-foreground max-w-2xl">
+            Chaque création Look Web Digital est pensée pour un seul objectif : rendre votre marque
+            incontournable. Identité visuelle, sites web, vidéos et campagnes — découvrez comment nos
+            réalisations transforment la visibilité de nos clients en résultats concrets.
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        </header>
+
+        <Gallery>
+          <GalleryGrid>
+            {IMAGES.map((image) => (
+              <GalleryImage 
+                key={image.id} 
+                id={image.id} 
+                src={image.src} 
+                alt={`Réalisation Look Web Digital — projet ${image.id}`} 
+              />
+            ))}
+          </GalleryGrid>
+        </Gallery>
+      </div>
     </div>
+
+    <Services />
+
+    <Team/>
+
+    <StatsPartners  />
+    
+    <Footer />
+  </>
   );
 }
