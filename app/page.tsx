@@ -1,14 +1,22 @@
 "use client";
 import * as React from "react";
+import dynamic from "next/dynamic";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import InversionCircleScrollAnimation from "./components/sections/Scroll";
-import Services from "./components/sections/Services";
 import { Gallery, GalleryGrid, GalleryImage } from "./components/sections/Galery";
-import Team from "./components/sections/Team";
-import StatsPartners from "./components/sections/StatsandPartners";
+import { optimizeImageUrl } from "@/lib/media";
+import { useMedia } from "@/lib/useMedia";
 
-const IMAGES = [
+// Sections sous la ligne de flottaison : chargées en script séparé,
+// pour ne pas gonfler le bundle initial.
+const Services = dynamic(() => import("./components/sections/Services"), { ssr: false });
+const Team = dynamic(() => import("./components/sections/Team"), { ssr: false });
+const StatsPartners = dynamic(() => import("./components/sections/StatsandPartners"), { ssr: false });
+
+// Contenu de secours (médias locaux) utilisé tant que la collection
+// "gallery" est vide dans Cloudinary.
+const FALLBACK_IMAGES = [
   { id: "1", src: "./images/audio.jpg" },
   { id: "2", src: "./images/brand1.jpg" },
   { id: "13", src: "./images/srt.png" },
@@ -22,10 +30,26 @@ const IMAGES = [
   { id: "10", src: "./images/mark.jpg" },
   { id: "11", src: "./images/social.jpg" },
   { id: "12", src: "./images/dev.jpg" },
-  
 ];
 
 export default function Home() {
+  const { assets } = useMedia("gallery");
+
+  // Les médias Cloudinary prennent le dessus dès qu'ils existent.
+  // Les vignettes sont redimensionnées côté Cloudinary (f_auto,q_auto,w_…) :
+  // 3 à 5× plus légères ; la version pleine réservation pour le modal.
+  const galleryImages = assets.length
+    ? assets.map((a) => ({
+        id: a.publicId,
+        src: optimizeImageUrl(a.url, { w: 800 }),
+        fullSrc: optimizeImageUrl(a.url, { w: 1800 }),
+        alt: a.name || `Réalisation Look Web Digital`,
+      }))
+    : FALLBACK_IMAGES.map((image) => ({
+        ...image,
+        fullSrc: image.src,
+        alt: `Réalisation Look Web Digital — projet ${image.id}`,
+      }));
 
 
 // Fix for app.tsx infrastructure horizontal scrolling
@@ -44,10 +68,10 @@ export default function Home() {
     {/* <Hero/> */}
     <InversionCircleScrollAnimation
       videoSrc="/videos/stade.mp4"
-      poster="/images/hero-poster.jpg"
+      poster="/images/paysage.jpg"
     />
 
-    <div className="w-full self-start bg-white">
+    <div className="w-full self-start bg-white hidden md:block">
       <div id="realisation" className="max-w-7xl mx-auto px-6 py-12 md:py-16">
         <header className="mb-10 space-y-4">
           <h1 className="text-5xl font-bold tracking-tight text-primary">
@@ -62,12 +86,13 @@ export default function Home() {
 
         <Gallery>
           <GalleryGrid>
-            {IMAGES.map((image) => (
-              <GalleryImage 
-                key={image.id} 
-                id={image.id} 
-                src={image.src} 
-                alt={`Réalisation Look Web Digital — projet ${image.id}`} 
+            {galleryImages.map((image) => (
+              <GalleryImage
+                key={image.id}
+                id={image.id}
+                src={image.src}
+                fullSrc={image.fullSrc}
+                alt={image.alt}
               />
             ))}
           </GalleryGrid>
@@ -75,13 +100,26 @@ export default function Home() {
       </div>
     </div>
 
-    <Services />
+    <React.Suspense fallback={<SectionPlaceholder />}>
+      <Services />
+    </React.Suspense>
 
-    <Team/>
+    <React.Suspense fallback={<SectionPlaceholder />}>
+      <Team />
+    </React.Suspense>
 
-    <StatsPartners  />
+    <React.Suspense fallback={<SectionPlaceholder />}>
+      <StatsPartners />
+    </React.Suspense>
     
     <Footer />
   </>
+  );
+}
+
+/** Skeleton minimal pendant le chargement des sections dynamiques. */
+function SectionPlaceholder() {
+  return (
+    <div className="w-full bg-white" style={{ minHeight: "60vh" }} aria-hidden />
   );
 }

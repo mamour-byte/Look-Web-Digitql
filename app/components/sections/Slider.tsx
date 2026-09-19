@@ -1,5 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useMedia } from "@/lib/useMedia";
+import { optimizeVideoUrl } from "@/lib/media";
 
 // ─── palette (identique au reste du site) ─────────────────────────────────────
 const WHITE = "#ffffff";
@@ -55,18 +57,29 @@ export default function StudioDecors({
   decors = DEFAULT_DECORS,
   autoPlayDelay = 10000,
 }: Props) {
-  const count = decors.length;
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<1 | -1>(1);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
   const autoTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Médias Cloudinary de la collection "slider" : chaque vidéo devient une slide.
+  const { assets } = useMedia("slider");
+  const cloudDecors: Decor[] = assets.map((a) => ({
+    name: a.name || "Réalisation",
+    video: optimizeVideoUrl(a.url),
+    address: "",
+    addressHref: "#",
+    capacity: 0,
+  }));
+  const finalDecors = cloudDecors.length ? cloudDecors : decors;
+  const finalCount = finalDecors.length;
+
   const goTo = useCallback(
     (next: number, direction: 1 | -1) => {
       setDir(direction);
-      setIndex((next + count) % count);
+      setIndex((next + finalCount) % finalCount);
     },
-    [count],
+    [finalCount],
   );
 
   const prev = useCallback(() => goTo(index - 1, -1), [goTo, index]);
@@ -74,12 +87,12 @@ export default function StudioDecors({
 
   // Passage automatique régulier au décor suivant.
   useEffect(() => {
-    if (count <= 1) return;
+    if (finalCount <= 1) return;
     autoTimer.current = setTimeout(() => goTo(index + 1, 1), autoPlayDelay);
     return () => {
       if (autoTimer.current) clearTimeout(autoTimer.current);
     };
-  }, [index, autoPlayDelay, count, goTo]);
+  }, [index, autoPlayDelay, finalCount, goTo]);
 
   // ne joue que la vidéo active — les autres restent en pause pour économiser la bande passante
   useEffect(() => {
@@ -90,7 +103,7 @@ export default function StudioDecors({
     });
   }, [index]);
 
-  const d = decors[index];
+  const d = finalDecors[index];
 
   return (
     <>
@@ -102,7 +115,7 @@ export default function StudioDecors({
       >
         {/* pile vidéo en fondu croisé */}
         <div className="sdec-stage">
-          {decors.map((dec, i) => (
+          {finalDecors.map((dec, i) => (
             <video
               key={dec.video}
               ref={(el) => {

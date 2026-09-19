@@ -12,6 +12,7 @@ interface ImageData {
   id: string
   src: string
   alt?: string
+  fullSrc?: string
 }
 
 interface GalleryContextType {
@@ -97,11 +98,13 @@ export function GalleryImage({
   alt,
   id,
   className,
+  fullSrc,
 }: {
   src: string
   alt?: string
   id: string
   className?: string
+  fullSrc?: string
 }) {
   const context = React.useContext(GalleryContext)
   if (!context) throw new Error("GalleryImage must be used within a Gallery")
@@ -114,12 +117,14 @@ export function GalleryImage({
         "relative mb-4 break-inside-avoid cursor-zoom-in rounded-xl overflow-hidden",
         className
       )}
-      onClick={() => context.setSelectedImage({ id, src, alt })}
+      onClick={() => context.setSelectedImage({ id, src, alt, fullSrc })}
     >
       <motion.img
         layoutId={`image-${id}`}
         src={src}
         alt={alt || "Gallery Image"}
+        loading="lazy"
+        decoding="async"
         className="w-full h-auto object-cover rounded-xl"
         variants={{
           hover: { scale: 0.98 },
@@ -185,7 +190,7 @@ function GalleryModal() {
             {/* The Shared Element */}
             <motion.img
               layoutId={`image-${selectedImage.id}`}
-              src={selectedImage.src}
+              src={selectedImage.fullSrc || selectedImage.src}
               alt={selectedImage.alt || "Selected gallery image"}
               className="w-auto h-auto max-w-[95vw] max-h-[90vh] rounded-xl shadow-2xl object-contain will-change-transform"
               draggable={false} // Prevent native drag to allow framer-motion drag

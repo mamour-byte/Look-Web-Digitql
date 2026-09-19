@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CURATION DES MÉDIAS VIA CLOUDINARY
 
-## Getting Started
+Les composants **Galery**, **Scroll** et **Slider** lisent leurs médias depuis
+un compte Cloudinary. Un dashboard d'administration (`/admin`) permet d'y
+importer, réordonner, renommer et supprimer les fichiers — sans toucher au code.
 
-First, run the development server:
+## 1. Configuration (uniquement dans `.env`)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```env
+CLOUDINARY_URL=cloudinary://API_KEY:API_SECRET@CLOUD_NAME
+ADMIN_PASSWORD=un-mot-de-passe-fort
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `CLOUDINARY_URL` : votre URL de connexion Cloudinary
+  (Dashboard Cloudinary → **Settings → Access keys**).
+- `ADMIN_PASSWORD` : mot de passe du dashboard `/admin`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copiez `.env.example` vers `.env.local` et renseignez ces deux valeurs.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 2. Importer des médias
 
-## Learn More
+1. Lancez le serveur : `npm run dev`
+2. Ouvrez **http://localhost:3000/admin** et connectez-vous.
+3. Choisissez la collection cible puis importez vos fichiers :
 
-To learn more about Next.js, take a look at the following resources:
+| Collection | Composant | Contenu attendu |
+| ---------- | --------- | --------------- |
+| `Galery`   | page d'accueil (galerie) | **Images** |
+| `Slider`   | slider de prestations | **Vidéos** (le « Titre » est affiché sur chaque slide) |
+| `Scroll`   | hero de la page d'accueil | **Vidéo** de couverture + **image** de poster facultative |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+L'ordre s'ajuste avec les flèches ↑/↓. Vous pouvez aussi créer un lien de
+partage/publication vers n'importe quel média. Tout est stocké dans le dossier
+`lookweb/{collection}` de votre compte Cloudinary.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 3. Comportement des composants
 
-## Deploy on Vercel
+- Dès qu'une collection contient des médias Cloudinary, le composant affiche
+  **ces médias** (avec la priorité).
+- Si la collection est **vide** (ou si `CLOUDINARY_URL` manque), le composant
+  bascule sur les fichiers locaux de `public/images` et `public/videos` —
+  le site reste donc toujours fonctionnel.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> Astuce : une fois vos fichiers importés sur Cloudinary, vous pouvez supprimer
+> le contenu volumineux de `public/` pour alléger le dépôt.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 4. Déploiement (Vercel, etc.)
+
+Renseignez `CLOUDINARY_URL` et `ADMIN_PASSWORD` dans les variables
+d'environnement de votre plateforme d'hébergement, puis déployez comme
+d'habitude : `npm run build`.
+
+## 5. Aide mémoire des dossiers Cloudinary
+
+| Collection | Dossier Cloudinary        |
+| ---------- | ------------------------- |
+| Galery     | `lookweb/gallery`         |
+| Scroll     | `lookweb/scroll`          |
+| Slider     | `lookweb/slider`          |
+
+Le tri s'appuie sur le contexte `order` stocké sur chaque asset Cloudinary.

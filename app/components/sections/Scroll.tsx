@@ -2,6 +2,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Fragment } from "react";
 import { AboutSection } from "./About";
+import { useMedia } from "@/lib/useMedia";
+import { optimizeVideoUrl } from "@/lib/media";
 
 // ─── constants ────────────────────────────────────────────────────────────────
 const BALL_SIZE = 380; // px — diamètre fixe pendant le trajet Phase 1
@@ -23,11 +25,18 @@ export default function InversionCircleScrollAnimation({
   poster = "../../images/paysage.jpg",
 }: Props) {
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  // La vidéo de couverture vient de Cloudinary (collection "scroll") ;
+  // le poster et la section About restent en images locales statiques.
+  const { assets } = useMedia("scroll");
+  const cloudVideo = assets.find((a) => a.resourceType === "video");
+  const resolvedVideo = cloudVideo ? optimizeVideoUrl(cloudVideo.url) : videoSrc;
+
   return (
     <>
       <Styles />
       <div ref={wrapperRef} id="top" className="icsa-wrap">
-        <HeroSection wrapperRef={wrapperRef} videoSrc={videoSrc} poster={poster} />
+        <HeroSection wrapperRef={wrapperRef} videoSrc={resolvedVideo} poster={poster} />
         <ContentSection wrapperRef={wrapperRef} />
       </div>
     </>
